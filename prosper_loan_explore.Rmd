@@ -1,0 +1,490 @@
+---
+title: "Prosper Loan Exploration"
+author: "Andrew J. Gill"
+date: "March 31, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+library(reshape2)
+library(GGally)
+library(scales)
+library(memisc)
+library(lattice)
+library(MASS)
+library(dplyr)
+
+getwd()
+setwd("C:/Users/Andrew/Documents/Udacity/Data_Vis")
+loan = read.csv("prosperLoanData.csv")
+prosper <- loan[, c("BorrowerAPR", "ProsperScore", "LoanOriginalAmount", "Term", 'ListingCreationDate')]
+prosper$year <- substring(prosper$ListingCreationDate, 0, 4)
+loan$year <- substring(loan$ListingCreationDate, 0, 4)
+prosper <- na.omit(prosper)
+
+write.csv(prosper, file="prosper.csv", row.names=F)
+write.table(prosper, file="prosper.tsv", quote=F, sep='\t', row.names=F)
+
+
+apr_by_year_score <- group_by(loan, ProsperScore, year) %>%
+                summarise(mean_apr= mean(BorrowerAPR),
+                n = n()) %>%
+                ungroup()
+
+apr_by_year_rating <- group_by(loan, ProsperRating..Alpha., year, ProsperScore) %>%
+                summarise(mean_apr= mean(BorrowerAPR),
+                          mean_yield=mean(EstimatedEffectiveYield),
+                          mean_amount=mean(LoanOriginalAmount),
+                          mean_return=mean(EstimatedReturn),
+                n = n()) %>%
+                ungroup()
+
+
+
+loan$ProsperScore <- factor(loan$ProsperScore,
+                              levels = c(0,1,2,4,5,6,7,8,9,10))
+apr_by_year_rating <- na.omit(apr_by_year_rating)
+apr_by_year_rating$mean_apr <- round(apr_by_year_rating$mean_apr, digits =4) 
+apr_by_year_rating$mean_return <- round(apr_by_year_rating$mean_return, digits =4) 
+
+
+write.table(apr_by_year_rating, file="prosper_summary.tsv", quote=F, sep='\t', row.names=F)
+
+
+```
+
+```{r}
+ggplot(aes(x=year, y= mean_apr, color=ProsperScore), data=apr_by_year_score) +
+  geom_point() +
+  scale_color_brewer(type='div') +
+  theme_dark()
+```
+```{r}
+ggplot(aes(x=year, y= mean_yield, color=ProsperRating..Alpha.), data=apr_by_year_rating) +
+  geom_point() +
+  scale_color_brewer(type='div') +
+  theme_dark()
+```
+
+```{r}
+
+years = c('2009', '2010', '2011', '2012', '2013', '2014')
+
+for (year in years) {
+ plot <- ggplot(aes(x=ProsperRating..Alpha., y= mean_apr, color=ProsperScore), data=apr_by_year_rating[apr_by_year_rating$year == year, ]) +
+  geom_point() +
+  scale_color_brewer(type='div') +
+  theme_dark()
+ 
+ print(plot)
+}
+
+
+
+```
+
+
+```{r}
+
+years = c('2009', '2010', '2011', '2012', '2013', '2014')
+
+for (year in years) {
+ plot <- ggplot(aes(x=ProsperRating..Alpha., y= mean_return, color=ProsperScore), data=apr_by_year_rating[apr_by_year_rating$year == year, ]) +
+  geom_point() +
+  scale_color_brewer(type='div') +
+  theme_dark()
+ 
+ print(plot)
+}
+
+
+
+```
+```{r}
+for (year in years) {
+ plot <- ggplot(aes(x=ProsperRating..Alpha., y= mean_return, color=ProsperScore), data=apr_by_year_rating[apr_by_year_rating$year == year, ]) +
+  geom_point() +
+  scale_color_brewer(type='div') +
+  theme_dark()
+ 
+ print(plot)
+
+}
+
+
+```
+
+```{r}
+
+year_2009 <- loan[loan$year == '2009', ]
+
+
+years = c('2009', '2010', '2011', '2012', '2013', '2014')
+
+for (year in years) {
+ plot <- ggplot(aes(x=ProsperRating..Alpha.), color=ProsperRating..Alpha.= data=loan[loan$year == year, ]) +
+  geom_bar(aes(y = (..count..)/sum(..count..)))
+ 
+ print(plot)
+}
+
+plot <- ggplot(aes(x=ProsperRating..Alpha.), color=ProsperRating..Alpha.= data=loan[loan$year == year, ]) +
+  geom_bar(aes(y = (..count..)/sum(..count..)))
+
+```
+```{r}
+
+by_year <- group_by(loan[], ProsperRating..Alpha., year) %>%
+          summarise(count=n())
+
+
+ggplot(aes(x=year, y=count, color=ProsperRating..Alpha.), data=by_year) +
+  geom_line(aes(group=ProsperRating..Alpha.))
+
+```
+
+```{r}
+
+years = c('2009', '2010', '2011', '2012', '2013', '2014')
+
+for (year in years) {
+ plot <- ggplot(aes(x=mean_apr, y= mean_return, color=ProsperRating..Alpha.), data=apr_by_year_rating[apr_by_year_rating$year == year, ]) +
+  geom_point(aes()) +
+  scale_color_brewer(type='div') +
+  theme_dark()
+ 
+ print(plot)
+}
+
+
+
+```
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r}
+ggplot(aes(x=ProsperRating..Alpha., y= mean_return/mean_apr, color=ProsperRating..Alpha.), data=apr_by_year_rating) +
+  geom_point() +
+  scale_color_brewer(type='div') +
+  theme_dark()
+
+```
+
+
+
+
+```{r}
+
+year_2009 <- loan[loan$year == '2009', ]
+
+ggplot(aes(x=ProsperScore, y=ProsperRating..numeric.), data=loan) +
+  geom_point()
+
+corr_test <- loan[, c('ProsperScore', 'ProsperRating..numeric.')]
+corr_test <- na.omit(corr_test)
+
+transform(corr_test, ProsperScore= as.double(ProsperScore))
+
+typeof(score)
+
+score <- corr_test$ProsperScore
+rating <- corr_test$ProsperRating..numeric.
+
+
+
+cor(score, rating)
+
+```
+
+
+
+
+
+
+```{r pressure, echo=FALSE}
+str(loan)
+
+#not sure why this logic is taking forever and 
+start <- c(0)
+end = c(10)
+max = c(length(names(loan)))
+while (end != max) {
+  if (end > max) {
+    end <- max
+  }
+  plot <- loan[, start:end]
+  a <- ggplot(data = melt(plot), mapping = aes(x = value)) + 
+    geom_histogram() +
+    geom_density() + 
+    facet_wrap(~variable, scales = 'free_x')
+  print(a)
+  start <- end
+  end <- end + 10
+}
+
+summary(loan$CurrentCreditLines)
+summary(loan$EmploymentStatusDuration)
+summary(loan$PublicRecordsLast10Years)
+summary(loan$StatedMonthlyIncome)
+summary(loan$LoanOriginalAmount)
+summary(loan$InvestmentFromFriendsCount)
+summary(loan$Investors)
+```
+Notes about distributions
+
+Borrow Rate is between .05 and .35
+APR is slightly higher
+
+looks like mostly 3 and 5 year terms 
+
+despite different yields the estimate return is more tightly clustered which probably factors in that higher interest rates are more likely to default.
+
+prosper score seems pretty evenly distributed with but with higher numbers in the middle of the spectrum
+
+employment duration is skewed to the left. will have to drill down farther into it. 
+
+way more credit lines than curret/ open than i though
+summary(loan$OpenCreditLines)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+   0.00    6.00    9.00    9.26   12.00   54.00    7604 
+   
+   
+median is about $60000 a year then
+summary(loan$StatedMonthlyIncome)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+      0    3200    4667    5608    6825 1750000 
+      
+spikes around multiples of 5
+ summary(loan$LoanOriginalAmount)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1000    4000    6500  
+  8337   12000   35000 
+  
+Practically no loans are invested from a friends account
+summary(loan$InvestmentFromFriendsCount)
+  Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+0.00000  0.00000  0.00000  0.02346  0.00000 33.00000
+
+
+loans from Investors is skewed left
+summary(loan$Investors)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1.00    2.00   44.00   80.48  115.00 1189.00 
+```{r}
+#this is not right i will have to group by 
+
+library(dplyr)
+
+summary(loan$BorrowerAPR)
+
+
+apr_by_income <- group_by(loan, IncomeRange) %>%
+                summarise(mean_apr= mean(BorrowerAPR),
+                n = n())
+
+apr_by_score <- group_by(loan, ProsperScore) %>%
+                summarise(mean_apr= mean(BorrowerAPR),
+                n = n())
+
+
+apr_by_income <- subset(apr_by_income, !is.na(mean_apr))
+
+
+ggplot(aes(x =IncomeRange, y=mean_apr), data = apr_by_income) + 
+    geom_bar(stat = "identity") +
+    scale_y_continuous(breaks = seq(0, .3, .05))
+
+
+ggplot(aes(x =ProsperScore, y=mean_apr), data = apr_by_score) + 
+    geom_bar(stat = "identity") +
+    scale_y_continuous(breaks = seq(0, .3, .05))
+
+ggplot(aes(x =ProsperRating..Alpha., y=mean_apr), data = apr_by_score) + 
+    geom_bar(stat = "identity") +
+    scale_y_continuous(breaks = seq(0, .3, .05))
+
+
+    
+
+apr_by_income$IncomeRange
+
+is.ordered(apr_by_income$IncomeRange)
+
+
+apr_by_income$IncomeRange <- factor(apr_by_income$IncomeRange,
+                              levels = c('Not employed', '$0', '$1-24,999', '$25,000-49,999', '$50,000-74,999', '$75,000-99,999', '$100,000+'),
+                              ordered = TRUE)
+```
+
+
+
+```{r, fig.width=12, fig.height=12}
+
+summary(loan$LoanStatus)
+```
+
+
+
+First 
+```{r, fig.width=12, fig.height=12}
+
+
+
+loan_matrix <- loan[, c(5,6,8,9,10,11,12,13,14)]
+loan_matrix <- na.omit(loan_matrix)
+
+
+ggpairs(loan_matrix)
+
+
+
+
+
+```
+
+```{r}
+
+ggplot(aes(x =EstimatedLoss, y=BorrowerAPR, color=LoanStatus), data = loan) + 
+    geom_point()
+
+
+
+
+
+
+```
+
+
+
+```{r}
+
+loan$ProsperScore <- factor(loan$ProsperScore,
+                              levels = c(0,1,2,4,5,6,7,8,9,10))
+
+ggplot(aes(x =EstimatedEffectiveYield, y=BorrowerAPR, color=IncomeRange), data = loan) + 
+    geom_point()
+
+
+
+
+
+
+
+```
+
+```{r}
+
+ggplot(aes(x=BorrowerAPR, y=EstimatedEffectiveYield, color=ProsperRating..numeric.), data = loan) + 
+    geom_point(alpha = 1/10)
+
+
+
+
+
+
+```
+Key variables in the scorecard are:
+
+Number of inquiries on the credit bureau
+Number of delinquent accounts on the credit bureau
+Credit card utilization on the credit bureau
+Number of recently opened trades on the credit bureau
+Debt to income ratio
+Loan payment performance on prior Prosper loans
+```{r, fig.width=12, fig.height=12}
+
+loan$ProsperScore <- factor(loan$ProsperScore,
+                              levels = c(0,1,2,4,5,6,7,8,9,10),
+                            ordered = TRUE)
+
+loan$Term <- factor(loan$Term, levels = c(12, 36, 60),
+                    ordered = TRUE)
+
+ggplot(aes(x =BorrowerAPR, y=EstimatedEffectiveYield, color=Term), data = loan) + 
+    geom_point(aes(size=LoanOriginalAmount), alpha= 1/10)  +
+    facet_wrap(~ProsperScore)
+
+summary(loan$LoanOriginalAmount)
+
+
+```
+
+
+
+
+```{r}
+
+loan$IncomeRange <- factor(loan$IncomeRange,
+                              levels = c('Not employed', '$0', '$1-24,999', '$25,000-49,999', '$50,000-74,999', '$75,000-99,999', '$100,000+'),
+                              ordered = TRUE)
+
+ggplot(aes(x =EstimatedEffectiveYield, y=BorrowerAPR, color=IncomeRange), data = loan) + 
+    geom_point() +
+    scale_color_brewer(type ="seq")
+
+
+```
+
+
+```{r}
+ggplot(aes(x =EmploymentStatusDuration, y=BorrowerAPR), data = loan) + 
+    geom_point()
+
+
+```
+
+
+```{r}
+ggplot(aes(x =ProsperRating..Alpha., y=BorrowerAPR, color=ProsperScore), data = loan) + 
+    geom_point(alpha= 1/5) +
+    scale_color_brewer(type='div')
+    facet_wrap(~ProsperRating..Alpha.)
+
+
+
+
+```
+
+
+```{r}
+ggplot(aes(x =ProsperScore, y=BorrowerAPR), data = loan) + 
+    geom_boxplot()
+
+
+```
+
+Key variables in the scorecard are:
+
+Number of inquiries on the credit bureau
+Number of delinquent accounts on the credit bureau
+Credit card utilization on the credit bureau
+Number of recently opened trades on the credit bureau
+Debt to income ratio
+Loan payment performance on prior Prosper loans
+```{r}
+ggplot(aes(x =LoanOriginalAmount, y=BorrowerAPR), data = loan) + 
+    geom_point()
+
+
+```
+
+
+Source
+https://www.orchardplatform.com/blog/alphabetic-ratings-and-numeric-scores-on-prosper/
+https://www.prosper.com/about-us/wp-content/uploads/Performance_Update_January2017.pdf
+
+http://dimplejs.org/advanced_examples_viewer.html?id=advanced_storyboard_control
+https://github.com/d3/d3-scale-chromatic
+
+http://colorbrewer2.org/#type=diverging&scheme=BrBG&n=7
+
+https://discussions.udacity.com/t/custom-tooltip-legend-order/189042/6
+
+https://techcrunch.com/2008/11/26/sec-outlines-its-reasoning-for-shutting-down-p2p-lender-prosper/

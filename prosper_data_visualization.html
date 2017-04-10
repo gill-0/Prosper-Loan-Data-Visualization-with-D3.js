@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+    <style>
+    h1 {w
+      background-color:#01665e;
+      color: white;
+      padding: 20px;
+    }
+    body {
+        max-width: 948px;
+        margin: 0 auto;
+    }
+    svg {
+      max-width: 948px;
+      display: block;
+      margin: 0 auto;
+
+    }
+
+    .footer {
+    background-color: #f4f4ef;
+    padding: 24px 15px 200px;
+    color: #01665e;
+    }
+
+    }
+  </style>
+    <script type="text/javascript">
+      function plot(data) {
+
+
+
+          "use strict";
+          var margin = 75,
+              legend_width = 100,
+              width = 1400 - margin - legend_width,
+              height = 600 - margin;
+
+
+
+
+          //debugger;
+          //
+          var svg = d3.select("#container")
+            .append("svg")
+              .attr("width", width + margin)
+              .attr("height", height + margin)
+            .append('g')
+                .attr('class','chart');
+
+
+          //data = dimple.filterData(data, "year", "2009");
+
+          // code for the indicator
+          var indicator = new dimple.chart(svg, data);
+
+          indicator.defaultColors = [
+            new dimple.color("lightgray", 1),
+            new dimple.color("#01665e", 1)
+            ];
+
+          var defaultColor = indicator.defaultColors[0];
+          var indicatorColor = indicator.defaultColors[1];
+
+
+          var frame=2000;
+
+          var firstTick = true;
+
+          //position of indciator bar will change later
+          indicator.setBounds(700, 49, '20%', '85%');
+          ///adding years for y axis
+          var y =indicator.addCategoryAxis('y', 'year');
+          //number of loan for x axis
+          var years = ['2014', '2013', '2012', '2011', '2010', '2009']
+          y.addOrderRule("year", 'Desc');
+          var x =indicator.addMeasureAxis('x', 'n');
+          x.hidden =true;
+
+          var s = indicator.addSeries(null, dimple.plot.bar);
+          s.addEventHandler("click", onClick);
+
+
+          // taken from dimple story board example
+          svg.selectAll("title_text")
+                  .data(["Click bar to select year.",
+                      "Re-click to resume."])
+                  .enter()
+                  .append("text")
+                  .attr("x", 700)
+                  .attr("y", function (d, i) { return 20 + i * 12; })
+                  .style("font-family", "sans-serif")
+                  .style("font-size", "10px")
+                  .style("color", "Black")
+                  .text(function (d) { return d; });
+
+          svg.selectAll("disclaimer")
+                  .data(["*data from 2014 is only through March 10"])
+                  .enter()
+                  .append("text")
+                  .attr("x", 710)
+                  .attr("y", function (d, i) { return 565 + i * 12; })
+                  .style("font-family", "sans-serif")
+                  .style("font-size", "10px")
+                  .style("color", "Black")
+                  .text(function (d) { return d; });
+
+          indicator.draw();
+
+          /// remove uncessary objects from indicator
+          y.titleShape.remove();
+          y.shapes.selectAll("line, path").remove();
+          y.shapes.selectAll("text")
+                  .style("text-anchor", "start")
+                  .style("font-size", "13px")
+                  .style("font-weight", 'bold')
+                  .style("color", "#01665e")
+                  .attr("transform", "translate(120, .5)");
+
+
+          //draw the main chart
+          var myChart = new dimple.chart(svg, data);
+          myChart.setBounds(60, 50, '65%', '85%')
+          var x = myChart.addMeasureAxis("x", "mean_apr");
+          x.title = "Annual Percentage Rate";
+
+          x.tickFormat = '.1F';
+          var y = myChart.addMeasureAxis("y", "mean_return");
+          y.tickFormat = '.1';
+          y.title = "Estimated Return";
+
+          var mySeries =myChart.addSeries(["ProsperScore", "ProsperRating..Alpha."], dimple.plot.scatter)
+          var myLegend = myChart.addLegend(220,10,410,60);
+
+          //add legend title
+          svg.selectAll("legendLabel")
+            .data(["Prosper Credit Rating:"])
+            .enter()
+            .append("text")
+              .attr("x", 60)
+              .attr("y", 18)
+              .style("font-size", "13px")
+              .style("font-weight", "bold")
+              .style("color", "Black")
+              .text(function (d) { return d; });
+
+          // change legend to be in the order i want
+                myLegend._getEntries = function() {
+                    var orderedValues = ["AA", "A", "B", "C", "D", "E", "HR"];
+
+                    // B. These are the default settings for a legend
+                    // when you reset one part, you need to include all parts
+                    var entries = [];
+                    orderedValues.forEach(function(v) {
+                        entries.push({
+                            key : v,
+                            fill : myChart.getColor(v).fill,
+                            stroke : myChart.getColor(v).stroke,
+                            opacity : myChart.getColor(v).opacity,
+                            series : [mySeries],
+                            aggField : [v]
+                        });
+                    }, this);
+                    return entries;
+                };
+
+          myChart.defaultColors = [
+            new dimple.color("#8c510a","gray", 1),
+            new dimple.color("#d8b365","gray", 1),
+            new dimple.color("#f6e8c3","gray", 1),
+            new dimple.color("#f5f5f5","gray", 1),
+            new dimple.color("#c7eae5","gray", 1),
+            new dimple.color("#5ab4ac","gray", 1),
+            new dimple.color("#01665e","gray", 1),
+      ];
+
+
+
+
+          // storyboard for main chart
+          var story = myChart.setStoryboard("year", onTick);
+
+          story.frameDuration = frame;
+
+          story.addOrderRule(years.reverse());
+
+          //draw chart
+          myChart.draw();
+
+          //format chart labels
+
+
+          //orphan the legend so it doesnt refresh on tick
+          //needs to come after the draw function otherwise it wont work at all
+          myChart.legends = [];
+          story.storyLabel.remove();
+          // On click of the side chart
+          function onClick(e) {
+              // Pause the animation
+              story.pauseAnimation();
+              // If it is already selected resume the animation
+              // otherwise pause and move to the selected month
+              if (e.yValue === story.getFrameValue()) {
+                  story.startAnimation();
+              } else {
+                  story.goToFrame(e.yValue);
+                  story.pauseAnimation();
+              }
+          }
+
+      // On tick of the main charts storyboard
+          function onTick(e) {
+              if (!firstTick) {
+                  // Color all shapes the same
+                  s.shapes
+                          .transition()
+                          .duration(frame / 2)
+                          .style("fill", function (d) { return (d.y === e ? indicatorColor.fill : defaultColor.fill) })
+                          .style("stroke", function (d) { return (d.y === e ? indicatorColor.stroke : defaultColor.stroke) });
+              }
+              firstTick = false;
+          }
+          d3.select("body").append("p").text("Each circle represents the average return and APR for a Prosper Credit Rating and Prosper Score in the given year. Both metrics are used to measure the riskiness of the loan. AA is the least risky while HR contains the highest risk. The Prosper Score is on a scale from 1-10, 1 being the most risky.  ")
+
+          d3.select("body").append("h2")
+            .attr("class", "footer")
+            .text("By Andrew Gill")
+          //debugger;
+        };
+      </script>
+  </head>
+<body>
+  <div id="content">
+     <div>
+        <h1 id="banner">Peer-to-Peer Lending with Prosper Loans</h1>
+        <div id="container">
+        <p id="p1">
+          Prosper is a peer-to-peer lending company marketed as an alternative to banks that launched in 2006. Individuals can loan money to others as a compliment to thier existing investments as well as recieve loans. In 2008 the SEC issued a cease-and-desist to Prosper on all new loans. They were not able to create new loans until late 2009. During this process they switched thier loan ratings system from "Credit Grades" to "Prosper Ratings and Scores."
+          <h2>
+          Ratings Become More Consistent with Interest Rates Over Time
+        </h2>
+      </div>
+  <script type="text/javascript">
+  /*
+    Use D3 (not dimple.js) to load the TSV file
+    and pass the contents of it to the draw function
+    */
+  d3.tsv("prosper_summary.tsv", plot);
+  </script>
+      </div>
+    </div>
+
+</body>
+</html>
