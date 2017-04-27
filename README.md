@@ -2,10 +2,9 @@
 Interactive Javascript Visualization on Loan Data
 
 
+## Summary 
 
-## Introduction
-
-Explored a loan data set of over 100,000 observations and 81 variables to create a meaningful visualization with D3.js and dimple.js
+Prosper is a peer-to-peer lending company marketed as an alternative to banks that launched in 2006. I explored a Prosper loan data set of over 100,000 observations and 81 variables to create a meaningful visualization with D3.js and dimple.js. My visualization examines the relationship of how Prosper Credit Ratings and Prosper Scores changed with interest rates over the years. 
 
 ## Final Visualization
 
@@ -23,7 +22,8 @@ Since both the x and y axis are continuous I though a scatter plot would best re
 
 ### Animation
 
-By exploring how the data changed over the years I found an intertesting trend, so I decided to incorporate an animation that stepped through the years in order to clearly see how the data changed over the years.
+By exploring how the data changed over the years I found an interesting trend, so I decided to incorporate an animation that stepped through the years in order to clearly see how the data changed. 
+
 
 ### Color
 
@@ -31,7 +31,7 @@ I used a diverging 7 point color scheme in order to clearly show the difference 
 
 ### Years Bar Chart
 
-Through the years Prosper has continued to grow. I thought that adding bar charts representing the number of loans would give more context to the visualization and they could double as an indicator for the year by changing the color when selected.
+Through the years Prosper has continued to grow. I thought that adding bar charts representing the number of loans would give more context to the visualization and the bars double as an indicator for the selected year by changing color. 
 
 ### Change from Feedback
 
@@ -41,7 +41,7 @@ I also changed the x and y axis labels to more clear. Y axis: Estimated Return -
 
 Expanded on the introduction to give readers a clearer understanding of the trend in the visualization.
 
-I had mixed feedback on the year's bar chart, but I think it is relatively simple/clear and I can make it clearer through the introdcution.
+I had mixed feedback on the year's bar chart, but I think it is relatively simple/clear and I can make it clearer through the introduction.
 
 ## Feedback
 
@@ -61,7 +61,7 @@ Takeaway is that high risk seems to be associated with high reward (except with 
 
 Thinks the bars on the right showing sample size are confusing. Is there a hugely significant difference between 2k and 30k? Spelling error in introductory paragraph
 
-###Feedback Person 3
+### Feedback Person 3
 
 I don’t actually ever say APR is Annual Percentage Rate
 
