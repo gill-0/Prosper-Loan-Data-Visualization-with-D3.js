@@ -43,9 +43,9 @@ Expanded on the introduction to give readers a clearer understanding of the tren
 
 I had mixed feedback on the year's bar chart, but I think it is relatively simple/clear and I can make it clearer through the introdcution.
 
-Feedback
+## Feedback
 
-###Feedback Person 1
+### Feedback Person 1
 
 Doesn’t quite understand what the x and y axis show
 
