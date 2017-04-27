@@ -5,7 +5,7 @@
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
     <style>
-    h1 {w
+    h1 {
       background-color:#01665e;
       color: white;
       padding: 20px;
@@ -126,12 +126,12 @@
           var myChart = new dimple.chart(svg, data);
           myChart.setBounds(60, 50, '65%', '85%')
           var x = myChart.addMeasureAxis("x", "mean_apr");
-          x.title = "Annual Percentage Rate";
+          x.title = "Borrower's Interest Rate (APR)";
 
-          x.tickFormat = '.1F';
+          x.tickFormat = '%';
           var y = myChart.addMeasureAxis("y", "mean_return");
-          y.tickFormat = '.1';
-          y.title = "Estimated Return";
+          y.tickFormat = '%';
+          y.title = "Investor's Estimated Return";
 
           var mySeries =myChart.addSeries(["ProsperScore", "ProsperRating..Alpha."], dimple.plot.scatter)
           var myLegend = myChart.addLegend(220,10,410,60);
@@ -224,7 +224,7 @@
               }
               firstTick = false;
           }
-          d3.select("body").append("p").text("Each circle represents the average return and APR for a Prosper Credit Rating and Prosper Score in the given year. Both metrics are used to measure the riskiness of the loan. AA is the least risky while HR contains the highest risk. The Prosper Score is on a scale from 1-10, 1 being the most risky.  ")
+          d3.select("body").append("p").text("Each circle represents the average of the estimated return on investment and APR (annual percentage rate) for a Prosper Credit Rating and Prosper Score in the given year. Both metrics are used to measure the riskiness of the loan. AA is the least risky Prosper Credit Rating, while HR contains the highest risk. The Prosper Score is on a scale from 1-10, 1 being the most risky.")
 
           d3.select("body").append("h2")
             .attr("class", "footer")
@@ -240,8 +240,12 @@
         <div id="container">
         <p id="p1">
           Prosper is a peer-to-peer lending company marketed as an alternative to banks that launched in 2006. Individuals can loan money to others as a compliment to thier existing investments as well as recieve loans. In 2008 the SEC issued a cease-and-desist to Prosper on all new loans. They were not able to create new loans until late 2009. During this process they switched thier loan ratings system from "Credit Grades" to "Prosper Ratings and Scores."
+          </p>
+          <p id="p2">
+          The following chart shows the new Prosper Credit Ratings and Prosper Scores when they started to issue loans again in 2009 and their continued growth through 2014. Initially a riskier Prosper Credit Rating and Score did not necessarily mean a higher estimated return for an investor.  Over the years; however, the relationship between the investor’s estimated return and the borrower’s interest rate has become more linear and consistent with the Prosper Credit Rating and Prosper Score.
+          </p>
           <h2>
-          Ratings Become More Consistent with Interest Rates Over Time
+          Prosper Credit Ratings Become More Consistent with Interest Rates Over Time
         </h2>
       </div>
   <script type="text/javascript">
