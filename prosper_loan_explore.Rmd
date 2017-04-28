@@ -476,7 +476,7 @@ ggplot(aes(x =LoanOriginalAmount, y=BorrowerAPR), data = loan) +
 ```
 
 
-Source
+Resources
 https://www.orchardplatform.com/blog/alphabetic-ratings-and-numeric-scores-on-prosper/
 https://www.prosper.com/about-us/wp-content/uploads/Performance_Update_January2017.pdf
 
