@@ -71,10 +71,16 @@ I should elaborate on my title of the visualization by explaining the visualizat
 
 ## Files
 
-HTML file containing data visualization
+HTML file containing final data visualization
 
 ```{r}
 prosper_data_visualization.html
+```
+
+HTML file containing initial data visualization
+
+```{r}
+prosper_data_visualization_initial.html
 ```
 
 R markdown document containing exploraty data analysis
